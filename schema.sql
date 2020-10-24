@@ -42,8 +42,9 @@ INSERT INTO role(title,salary,departmant_id) values("Manager",5000,4),
 ("Legal Team Lead",4000,4),("Lawyer",6000,4);
 
 
+INSERT INTO employee(first_name,last_name,role_id) values("Ashley","Rodriguez",1),
+("John","Doe",4),("Sarah","Lourd",7),("Kevin","Tupik",9);
 
-select * from department;
 
 
 

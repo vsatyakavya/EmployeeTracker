@@ -18,9 +18,18 @@ var connection = mysql.createConnection({
 });
 connection.connect(function (err) {
     if (err) throw err;
+    afterConnection()
     // run the start function after the connection is made to prompt the user
-    start();
+
 });
+
+function afterConnection() {
+    connection.query("SELECT * FROM department ", function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        start();
+    });
+}
 
 
 function start() {
@@ -70,36 +79,63 @@ function start() {
 };
 
 
-function viewAllEmployees(){
-    console.log("viewAllEmployees");
+function viewAllEmployees() {
+    connection.query("select * from emplo")
 };
 
-function viewAllEmployeesByDepartment(){
+function viewAllEmployeesByDepartment() {
     console.log("viewAllEmployeesByDepartment");
 };
-function   viewAllEmployeesByManager(){
+function viewAllEmployeesByManager() {
     console.log("viewAllEmployeesByManager");
 
 }
-function  AddEmployee(){
-    console.log("AddEmployee");
- 
-}
-function removeEmployee( )
-{
-    console.log("removeEmployee");
- 
-}
-function updateEmployeeRole(){
+function AddEmployee() {
+    inquirer.prompt([
+        {   
+            type: "input",
+            message: "What is employee's first name?",
+            name: "fname"
+        },
+        {
+            type : "input",
+            message: "what is employee's last name",
+            name :"lName"
 
-    console.log("updateEmployeeRole");
+        },
+        {
+            type : "list",
+            message :"what is employee's role?",
+            choices : ["Sales Lead","Salesperson","Lead Engineer","Software Engineer",
+                        "Accountant","Legal Team Lead","Lawyer"],
+            name : "role"
+        },
+        {
+           type :"list",
+           message : "Who is the employee's manager?",
+           choices : ["Ashley Rodriguez","John Doe","Sarah Lourd","Kevin Tupik","No Manager"],
+           name : "managerName"
+        }
 
+       
+    ]).then( function(answers){
+
+    });
 }
-function  updateEmployeeManager(){
+function removeEmployee() {
+                console.log("removeEmployee");
 
-    console.log("updateEmployeeManager");
+            }
+function updateEmployeeRole() {
 
-}
+                console.log("updateEmployeeRole");
+
+            }
+function updateEmployeeManager() {
+
+                console.log("updateEmployeeManager");
+
+            }
 
 
 
