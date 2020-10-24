@@ -92,50 +92,89 @@ function viewAllEmployeesByManager() {
 }
 function AddEmployee() {
     inquirer.prompt([
-        {   
+        {
             type: "input",
             message: "What is employee's first name?",
-            name: "fname"
+            name: "fName"
         },
         {
-            type : "input",
+            type: "input",
             message: "what is employee's last name",
-            name :"lName"
+            name: "lName"
 
         },
         {
-            type : "list",
-            message :"what is employee's role?",
-            choices : ["Sales Lead","Salesperson","Lead Engineer","Software Engineer",
-                        "Accountant","Legal Team Lead","Lawyer"],
-            name : "role"
+            type: "list",
+            message: "what is employee's role?",
+            choices: ["Sales Lead", "Salesperson", "Lead Engineer", "Software Engineer",
+                "Accountant", "Legal Team Lead", "Lawyer"],
+            name: "title1"
         },
         {
-           type :"list",
-           message : "Who is the employee's manager?",
-           choices : ["Ashley Rodriguez","John Doe","Sarah Lourd","Kevin Tupik","No Manager"],
-           name : "managerName"
+            type: "list",
+            message: "Who is the employee's manager?",
+            choices: ["Ashley Rodriguez", "John Doe", "Sarah Lourd", "Kevin Tupik", "No Manager"],
+            name: "managerName"
+            
         }
 
-       
-    ]).then( function(answers){
 
+    ]).then(function (answers) {
+        var d = answers.managerName.split(" ");
+        connection.query("select id from role where ?", { title : answers.title1 }, function (err, res) {
+             var query1 = res[0].id;
+         if (answers.managerName != "No Manager") {
+                  connection.query("select role_id from employee where ?",{first_name :d[0]} ,function (err, res) {
+                    query2 = res[0].role_id;
+                    connection.query(
+                        "INSERT INTO employee SET?",
+                        {
+                            first_name: answers.fName,
+                            last_name: answers.lName,
+                            role_id: query1,
+                            manager_id: query2
+                        
+        
+                        }
+                    )
+           
+                });
+            }
+            else{
+                connection.query(
+                    "INSERT INTO employee SET?",
+                    {
+                        first_name: answers.fName,
+                        last_name: answers.lName,
+                        role_id: query1,
+                        manager_id: null
+                    
+    
+                    }
+                )
+
+            }
+
+            
+        });
+
+        
     });
 }
 function removeEmployee() {
-                console.log("removeEmployee");
+    console.log("removeEmployee");
 
-            }
+}
 function updateEmployeeRole() {
 
-                console.log("updateEmployeeRole");
+    console.log("updateEmployeeRole");
 
-            }
+}
 function updateEmployeeManager() {
 
-                console.log("updateEmployeeManager");
+    console.log("updateEmployeeManager");
 
-            }
+}
 
 
 
