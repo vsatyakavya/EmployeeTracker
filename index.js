@@ -185,8 +185,8 @@ function removeEmployee() {
 
                 console.log("Employee deleted from database");
             })
-        })
-
+        }).catch(err) 
+        console.log(err);
     });
 
 
@@ -251,9 +251,71 @@ function updateEmployeeRole() {
 
 
 function updateEmployeeManager() {
+    connection.query("select first_name , last_name from employee ", function (err, res) {
 
-    console.log("updateEmployeeManager");
+        var employeeNames = [];
+        for (var i = 0; i < res.length; i++) {
+            var firstAndLastName = (res[i].first_name + " " + res[i].last_name);
+            employeeNames.push(firstAndLastName);
+        }
+        console.log(employeeNames);
+        connection.query("select first_name , last_name from employee where role_id = 1 OR role_id = 4 OR role_id = 7 OR role_id = 9 ", function (err, res) {
+            var managers = [];
+            for (var i = 0; i < res.length; i++) {
+                var firstAndLastName = (res[i].first_name + " " + res[i].last_name);
+                managers.push(firstAndLastName);
+            }
+            console.log(managers);
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "which employee's manager you want to update?",
+                    choices: employeeNames,
+                    name: "employeeName"
+                },
+                {
+                    type: "list",
+                    message: "select the manager",
+                    choices: managers,
+                    name: "manager"
+                }
 
+
+            ]).then(function (answers) {
+                console.log(answers);
+                var firstName = answers.manager.split(" ");
+                console.log(firstName);
+                console.log(firstName[0]);
+                console.log(firstName[1]);
+                connection.query("select role_id from employee where ?", { first_name: firstName[0]},
+                    function (err, res) {
+                        if (err) {
+                            console.log('err-=> ', err)
+                            throw err;
+                        }
+
+                        console.log('ress=-=-=>> ' ,  res);
+                        var newRoleManagerId = res[0].role_id;
+                        console.log(newRoleManagerId);
+
+                        var names = answers.employeeName.split(" ");
+                        console.log(names)
+                        connection.query("update employee set ? where ?",
+                            [{
+                                manager_id: newRoleManagerId
+                            },
+                            {
+                                first_name: names[0]
+                            }]
+                        );
+
+                    }
+                );
+            }).catch(err)
+            console.log(err);
+
+        })
+    });
 }
 
 
