@@ -18,6 +18,7 @@
   "homepage": "https://github.com/vsatyakavya/EmployeeTracker#readme",
   "dependencies": {
     "inquirer": "^7.3.3",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "table": "^6.0.3"
   }
 }

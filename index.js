@@ -31,77 +31,74 @@ function afterConnection() {
     });
 }
 
-var array = ["View All Employees", "View All Employees By Department", "View All Employees By Manager", "Add Department", "Add Role", "Add Employee",
-    "Remove Employee",
-    "update Employee Role", "Update Employee Manager"]
-function start() {
-    inquirer
-        .prompt({
+var array = ["View All Employees", "Add Department", "Add Role", "Add Employee", "view Departments", "view Roles", "Remove Employee","update Employee Role", "Update Employee Manager"]
+function start(){
+inquirer
+    .prompt({
 
-            type: "list",
-            message: "What would you like to do?",
-            choices: array,
-            name: "action",
-        })
-        .then(function (answer) {
-            // based on their answer, either call the bid or the post functions
-            if (answer.action === "View All Employees") {
-                viewAllEmployees();
-            }
-            else if (answer.action === "View All Employees By Department") {
-                viewAllEmployeesByDepartment();
+        type: "list",
+        message: "What would you like to do?",
+        choices: array,
+        name: "action",
+    })
+    .then(function (answer) {
+        // based on their answer, either call the bid or the post functions
+        if (answer.action === "View All Employees") {
+            viewAllEmployees();
+        }
 
-            }
-            else if (answer.action === "View All Employees By Manager") {
-                viewAllEmployeesByManager();
+        else if (answer.action === "Add Department") {
+            AddDepartment();
 
-            }
-            else if (answer.action === "Add Department") {
-                AddDepartment();
+        }
+        else if (answer.action === "Add Role") {
+            AddRole();
 
-            }
-            else if (answer.action === "Add Role") {
-                AddRole();
+        }
+        else if (answer.action === "Add Employee") {
+            AddEmployee();
 
-            }
-            else if (answer.action === "Add Employee") {
-                AddEmployee();
+        }
+        else if (answer.action === "view Departments") {
+            viewDepartment();
 
-            }
-            else if (answer.action === "Remove Employee") {
-                removeEmployee();
+        }
+        else if (answer.action === "view Roles") {
+            viewRoles();
 
-            }
-            else if (answer.action === "update Employee Role") {
-                updateEmployeeRole();
+        }
+        else if (answer.action === "Remove Employee") {
+            removeEmployee();
 
-            }
-            else if (answer.action === "Update Employee Manager") {
-                updateEmployeeManager();
+        }
+        else if (answer.action === "update Employee Role") {
+            updateEmployeeRole();
 
-            }
-            else {
-                connection.end();
-            }
-        });
-};
+        }
+        else if (answer.action === "Update Employee Manager") {
+            updateEmployeeManager();
+
+        }
+        else {
+            connection.end();
+        }
+    });
 
 
+
+
+
+
+}
 function viewAllEmployees() {
-    connection.query("select employee.id, employee.first_name, employee.last_name , role.title,role.salary from employee INNER JOIN role ON employee.role_id = role.id", function (err, res) {
+    connection.query(" select e.id, e.first_name, e.last_name , role.title, role.salary,  m.first_name AS manager_name from(employee e  INNER JOIN role ON e.role_id = role.id and role.title != 'Manager') left Join  employee m on e.manager_id = m.role_id ", function (err, res) {
         console.table(res);
     });
     connection.end();
 
 };
 
-function viewAllEmployeesByDepartment() {
-    console.log("viewAllEmployeesByDepartment");
-};
-function viewAllEmployeesByManager() {
-    console.log("viewAllEmployeesByManager");
 
-}
 
 function AddDepartment() {
     inquirer.prompt([
@@ -172,7 +169,6 @@ function AddRole() {
 }
 
 
-
 function AddEmployee() {
     // connection.query("select name from department", function (err, res) {
     //     if (err) {
@@ -183,24 +179,24 @@ function AddEmployee() {
     //         var name = res[i].name;
     //         departmentNames.push(name);
     //     }
-    connection.query("select title from role", function(err,res){
+    connection.query("select title from role", function (err, res) {
         console.log(res);
-        var title =[];
-        for(var i= 0 ; i< res.length;i++){
-            var eachtitle  = res[i].title;
+        var title = [];
+        for (var i = 0; i < res.length; i++) {
+            var eachtitle = res[i].title;
             title.push(eachtitle);
         }
 
-    
-        connection.query("select first_name , last_name from employee where role_id = 1 OR role_id = 4 OR role_id = 7 OR role_id = 9",function(err,res){
-            if(err){
+
+        connection.query("select first_name , last_name from employee where role_id = 1 OR role_id = 4 OR role_id = 7 OR role_id = 9", function (err, res) {
+            if (err) {
                 throw err
             }
             var managerNames = [];
             for (var i = 0; i < res.length; i++) {
                 var firstAndLastName = (res[i].first_name + " " + res[i].last_name);
                 managerNames.push(firstAndLastName);
-          }
+            }
             console.log(managerNames);
 
             inquirer.prompt([
@@ -213,7 +209,7 @@ function AddEmployee() {
                     type: "input",
                     message: "what is employee's last name",
                     name: "lName"
-    
+
                 },
                 {
                     type: "list",
@@ -226,10 +222,10 @@ function AddEmployee() {
                     message: "Who is the employee's manager?",
                     choices: managerNames,
                     name: "managerName"
-    
+
                 }
-    
-    
+
+
             ]).then(function (answers) {
                 var d = answers.managerName.split(" ");
                 connection.query("select id from role where ?", { title: answers.title1 }, function (err, res) {
@@ -244,11 +240,11 @@ function AddEmployee() {
                                     last_name: answers.lName,
                                     role_id: query1,
                                     manager_id: query2
-    
-    
+
+
                                 }
                             )
-    
+
                         });
                     }
                     else {
@@ -266,10 +262,23 @@ function AddEmployee() {
             });
         })
 
-        
-    })
-//  })
 
+    })
+    //  })
+
+}
+
+function viewDepartment() {
+    connection.query("select * from department", function (err, res) {
+        console.table(res);
+    })
+}
+
+function viewRoles(){
+    connection.query("select title from role",function(err,res){
+        if(err) throw err;
+        console.table(res);
+    })
 }
 function removeEmployee() {
     console.log("removeEmployee");
@@ -426,6 +435,7 @@ function updateEmployeeManager() {
     });
 }
 
+// select employee.id, employee.first_name, employee.last_name , role.title,role.salary,  m.first_name AS manager_name from (employee  INNER JOIN role ON employee.role_id = role.id) left Join  employee m on employee.manager_id = m.role_id; 
 
 
 
